@@ -74,6 +74,17 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > :run
 ```
 
+## 機能
+
+### Echo message
+
+T.B.D
+
+### Create Channel with Open Dialog
+
+T.B.D
+
+
 ## トラブルシューティング
 
 ### Socket Mode の AppToken を控えるのを忘れてしまった
