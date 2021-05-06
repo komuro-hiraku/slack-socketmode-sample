@@ -1,9 +1,10 @@
 import com.slack.api.bolt.App
-import com.slack.api.bolt.context.builtin.EventContext
 import com.slack.api.bolt.socket_mode.SocketModeApp
+import com.slack.api.methods.MethodsClient
 import com.slack.api.model.event.MessageEvent
 import com.slack.api.model.kotlin_extension.view.blocks
 import com.slack.api.model.view.Views.*
+import java.time.LocalDate
 
 
 fun main() {
@@ -24,37 +25,71 @@ fun main() {
         val modalView = view { v -> v
             .type("modal")
             .callbackId("modal-id")
-            .title(viewTitle {it.type("plain_text").text("タスク登録")})
-            .submit(viewSubmit {it.type("plain_text").text("送信")})
-            .close(viewClose { it.type("plain_text").text("キャンセル") })
+            .title(viewTitle {it.type("plain_text").text("Create War room")})
+            .submit(viewSubmit {it.type("plain_text").text("作成")})
+            .close(viewClose { it.type("plain_text").text("閉じる") })
             .blocks {
                 input {
-                    blockId("input-task")
+                    blockId("input-environment")
                     element {
                         plainTextInput {
-                            actionId("input")
+                            actionId("input-env")
+                            multiline(false)
+                        }
+                    }
+                    label("障害対応環境")
+                }
+                input {
+                    blockId("input-description")
+                    element {
+                        plainTextInput {
+                            actionId("input-desc")
                             multiline(true)
                         }
                     }
-                    label("タスクの詳細・期限などを書いてください")
+                    label("障害対応チャンネルの詳細を入力")
                 }
                 input {
-                    blockId("user-select")
+                    blockId("commander-select")
                     element {
-                        multiUsersSelect {
-                            actionId("multi-select")
-                            maxSelectedItems(3)
+                        usersSelect {
+                            actionId("commander-selected")
                         }
                     }
-                    label("ユーザーを選択してください")
+                    label("司令塔を選択してください")
+                }
+                input {
+                    blockId("operator-select")
+                    element {
+                        usersSelect {
+                            actionId("operator-selected")
+                        }
+                    }
+                    label("メイン対応者を選択してください")
+                }
+                input {
+                    blockId("recorder-select")
+                    element {
+                        usersSelect {
+                            actionId("recorder-selected")
+                        }
+                    }
+                    label("記録係を選択してください")
                 }
             }
         }
         ctx.asyncClient().viewsOpen { it.triggerId(req.payload.triggerId).view(modalView) }
         ctx.ack()
     }
+
+    // Submit動作を制御
     app.viewSubmission("modal-id") { req, ctx ->
         ctx.logger.info("Submitted data: {}", req.payload.view.state.values)
+        // create conversation
+        val vals = req.payload.view.state.values.get("input-environment")?.get("input-env")?.value
+        ctx.logger.info("vals = $vals")
+        val client = SlackClient(ctx.client(), ctx.botToken, vals)
+        ctx.logger.info("Created Channel: {}", client.createChannel())
         ctx.ack()
     }
 
@@ -62,10 +97,16 @@ fun main() {
     SocketModeApp(app).start()
 }
 
-class SlackClient(val eventContext: EventContext) {
+class SlackClient(val client: MethodsClient, val botToken: String, val environmentName: String?) {
 
-    fun createChannel() {
-        eventContext.client().conversationsCreate { it.name("war room channel") }
+    fun createChannel():Boolean {
+        val date = LocalDate.now()
+        val response = client.conversationsCreate { it
+            .name("$date-$environmentName-warroom")
+            .token(botToken)
+            .isPrivate(false)
+        }
+
+        return response.isOk
     }
-
 }

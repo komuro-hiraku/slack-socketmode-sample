@@ -10,6 +10,10 @@ gen
 # Compiled class file
 *.class
 
+# exclude gradle
+.gradle/
+build/
+
 # Log file
 *.log
 
