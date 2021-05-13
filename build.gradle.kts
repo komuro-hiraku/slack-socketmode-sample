@@ -14,9 +14,11 @@ repositories {
     mavenCentral()
 }
 
+val dockerRepository: String = System.getenv("DOCKER_REPOSITORY") ?: "example_repository"
+
 jib {
     to {
-        image = "com4dc/slack-socket-mode-sample"
+        image = "$dockerRepository/slack-socket-mode-sample"
     }
 }
 
