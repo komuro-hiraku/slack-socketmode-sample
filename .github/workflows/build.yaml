@@ -9,6 +9,15 @@ jobs:
 
       steps:
         - uses: actions/checkout@v2
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v2
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: us-east-1
+        - name: Login ECR
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v2
         - name: Restore Cache
           uses: actions/cache@v2
           with:
@@ -27,9 +36,9 @@ jobs:
           run: gradle wrapper
         - name: Grant execute permission for gradlew
           run: chmod +x gradlew
-        - name: Create Docker Image
+        - name: Build And Push
           env:
-            DOCKER_REPOSITORY: ${{secrets.DOCKER_REPOSITORY}}
-          run: ./gradlew jibDockerBuild -Djib.container.environment=SLACK_APP_TOKEN="${{secrets.SLACK_APP_TOKEN}}",SLACK_BOT_TOKEN="${{secrets.SLACK_BOT_TOKEN}}"
-        - name: Docker Image list
-          run: docker image ls
+            DOCKER_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}
+          run: |
+            ./gradlew jibDockerBuild -Djib.container.environment=SLACK_APP_TOKEN="${{secrets.SLACK_APP_TOKEN}}",SLACK_BOT_TOKEN="${{secrets.SLACK_BOT_TOKEN}}"
+            docker push $DOCKER_REGISTRY/slack-socket-mode-sample:latest
