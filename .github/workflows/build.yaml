@@ -4,6 +4,7 @@ on: [push]
 
 jobs:
     build:
+      environment: ECR_ENV
       runs-on: ubuntu-latest
 
       steps:
@@ -19,4 +20,8 @@ jobs:
           run: chmod +x gradlew
         - name: Build with Gradle
           run: ./gradlew build
+        - name: Describe Docker Repository Name
+          run: echo secrets.DOCKER_REPOSITORY
+        - name: Create Docker Image
+          run: ./gradlew jibDockerBuild
 
