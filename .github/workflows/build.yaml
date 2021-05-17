@@ -21,7 +21,7 @@ jobs:
         - name: Build with Gradle
           run: ./gradlew build
         - name: Describe Docker Repository Name
-          run: echo secrets.DOCKER_REPOSITORY
+          run: export DOCKER_REPOSITORY=${{secrets.DOCKER_REPOSITORY}}
         - name: Create Docker Image
-          run: ./gradlew jibDockerBuild
+          run: ./gradlew jibDockerBuild -Djib.container.environment=SLACK_APP_TOKEN="${{secrets.SLACK_APP_TOKEN}}",SLACK_BOT_TOKEN="${{secrets.SLACK_BOT_TOKEN}}"
 
