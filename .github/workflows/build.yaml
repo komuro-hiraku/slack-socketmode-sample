@@ -41,4 +41,4 @@ jobs:
             DOCKER_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}
           run: |
             ./gradlew jibDockerBuild -Djib.container.environment=SLACK_APP_TOKEN="${{secrets.SLACK_APP_TOKEN}}",SLACK_BOT_TOKEN="${{secrets.SLACK_BOT_TOKEN}}"
-            docker push $DOCKER_REGISTRY/slack-socket-mode-sample:latest
+            docker push $DOCKER_REPOSITORY/slack-socket-mode-sample:latest
