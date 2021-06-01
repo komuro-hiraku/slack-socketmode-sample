@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.4.31"
     id("application")
+
+    id("com.google.cloud.tools.jib") version "3.0.0"
 }
 
 group = "me.komurohiraku"
