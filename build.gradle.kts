@@ -14,14 +14,6 @@ repositories {
     mavenCentral()
 }
 
-val dockerRepository: String = System.getenv("DOCKER_REPOSITORY") ?: "example_repository"
-
-jib {
-    to {
-        image = "$dockerRepository/slack-socket-mode-sample"
-    }
-}
-
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

@@ -40,5 +40,5 @@ jobs:
           env:
             DOCKER_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}
           run: |
-            ./gradlew jibDockerBuild
+            ./gradlew jibDockerBuild -Djib.to.image=$DOCKER_REPOSITORY/slack-socket-mode-sample:latest
             docker push $DOCKER_REPOSITORY/slack-socket-mode-sample:latest
