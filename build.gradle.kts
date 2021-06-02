@@ -22,9 +22,18 @@ dependencies {
     implementation("org.glassfish.tyrus.bundles:tyrus-standalone-client:1.17")
     implementation("org.slf4j:slf4j-simple:1.7.30")
 
+    // httpclient https://square.github.io/okhttp/
+    // define a BOM and its version
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.0"))
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
+
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
+
+    // httpclient
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.9.0")
 }
 
 application {

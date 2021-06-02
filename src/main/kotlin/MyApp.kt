@@ -4,6 +4,9 @@ import com.slack.api.methods.MethodsClient
 import com.slack.api.model.event.MessageEvent
 import com.slack.api.model.kotlin_extension.view.blocks
 import com.slack.api.model.view.Views.*
+import me.komurohiraku.service.AbstractUuidGenerator
+import me.komurohiraku.service.UuidGenerator
+import me.komurohiraku.service.UuidType
 import java.time.LocalDate
 
 
@@ -17,6 +20,29 @@ fun main() {
         // req.event.user -> ユーザー名。@つけるとメンションになるっぽい　
         // req.event.text -> 入力されたテキスト
         ctx.say("こんにちは <@" + req.event.user + ">! " + req.event.text)
+        ctx.ack()
+    }
+
+    // slash command https://slack.dev/java-slack-sdk/guides/ja/slash-commands
+    app.command("/uuid") { req, ctx ->
+        val arguments = req.payload.text.split(" ")
+        ctx.logger.info("$arguments, ${arguments.size}")
+
+        var type = when (arguments.size) {
+            1 -> if (arguments.isEmpty()) {
+                arguments[0].toUpperCase()
+            } else {
+                AbstractUuidGenerator.DEFAULT_TYPE
+            } else -> {
+                ctx.logger.error("Failed Argument $arguments, Set default")
+                AbstractUuidGenerator.DEFAULT_TYPE
+            }
+        }
+        ctx.logger.info("input type: $type")
+
+        // java.lang.IllegalArgumentException がスローされる可能性
+        val uuid: UuidGenerator = AbstractUuidGenerator.from(UuidType.valueOf(type))
+        ctx.say("${uuid.generate()}")
         ctx.ack()
     }
 
